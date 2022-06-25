@@ -244,7 +244,7 @@ interface TextureOptions {
     type?: number;
     texture?: WebGLTexture;
     unit?: number;
-    image?: any;
+    image?: ImageData;
     width: number;
     height: number;
     depth?: number;
@@ -262,9 +262,22 @@ interface FramebufferOptions {
     stencil?: WebGLRenderbuffer;
 }
 
+type TypedArray =
+    | Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array
+    | BigInt64Array
+    | BigUint64Array;
+
 interface BufferOptions {
     target?: number;
     hint?: number;
     buffer?: WebGLBuffer;
-    data?: any;
+    data?: ArrayBuffer | SharedArrayBuffer | TypedArray | DataView;
 }
