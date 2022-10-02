@@ -1,3 +1,8 @@
+export type Program = {
+    program: WebGLProgram;
+    attributes: Map<string, number>;
+    uniforms: Map<string, WebGLUniformLocation>;
+};
 export class WebGL {
     private gl: WebGL2RenderingContext;
 
@@ -20,11 +25,7 @@ export class WebGL {
     }
 
     /* Create program using shaders in [shaders]. */
-    public createProgram(shaders: WebGLShader[]): {
-        program: WebGLProgram;
-        attributes: Map<string, number>;
-        uniforms: Map<string, WebGLUniformLocation>;
-    } {
+    public createProgram(shaders: WebGLShader[]): Program {
         const program = this.gl.createProgram();
         for (const shader of shaders) {
             this.gl.attachShader(program, shader);

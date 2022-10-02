@@ -1,0 +1,5 @@
+{
+    "ignore": ["build/", "dist/"],
+    "ext": "ts",
+    "exec": "npm run build && npm start"
+}

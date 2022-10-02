@@ -1,12 +1,29 @@
 body {
-    padding: 0;
-    margin: 0;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     align-items: center;
 }
 
+.content {
+    padding-top: 100px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    align-content: flex-start;
+}
+
+canvas {
+    background-color: #cecece;
+    margin: 10px;
+}
+
+#reconstruction-canvas {
+    width: 512px;
+    height: 512px;
+}
+
+#points-canvas, #residual-canvas {
+    width: 256px;
+    height: 256px;
+}
