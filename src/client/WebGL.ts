@@ -232,10 +232,6 @@ export class WebGL {
             data: new Float32Array([-1, -1, 1, -1, 1, 1, -1, 1]),
         });
     }
-
-    public getDrawingBufferDims(): [number, number] {
-        return [this.gl.drawingBufferWidth, this.gl.drawingBufferHeight];
-    }
 }
 
 interface TextureOptions {
