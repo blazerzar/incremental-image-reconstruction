@@ -10,7 +10,7 @@ export class SuccessiveOverRelaxation extends Solver {
         reconstructionCanvas: HTMLCanvasElement,
         pointsCanvas: HTMLCanvasElement,
         residualCanvas: HTMLCanvasElement,
-        omega: number
+        omega = 1.9
     ) {
         super(image, size, reconstructionCanvas, pointsCanvas, residualCanvas, [
             ["renderToCanvas.vert", "sor/updateRedBlack.frag"],

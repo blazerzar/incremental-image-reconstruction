@@ -32,6 +32,7 @@ export abstract class Solver {
     protected reconstructionRead: Drawing;
     protected reconstructionWrite: Drawing;
     protected residualDrawing: Drawing;
+    protected fDrawing: Drawing;
 
     // Buffers
     protected pointsVao: WebGLVertexArrayObject;
@@ -43,6 +44,7 @@ export abstract class Solver {
         ["renderPoints.vert", "renderPoints.frag"],
         ["renderToCanvas.vert", "renderToCanvas.frag"],
         ["renderToCanvas.vert", "renderResidual.frag"],
+        ["renderToCanvas.vert", "residual.frag"],
     ];
 
     constructor(
@@ -116,17 +118,18 @@ export abstract class Solver {
         this.gl.vertexAttribPointer(0, 2, this.gl.FLOAT, false, 0, 0);
     }
 
-    private initDrawings(): void {
-        this.pointsDrawing = this.createDrawing();
-        this.reconstructionRead = this.createDrawing();
-        this.reconstructionWrite = this.createDrawing();
-        this.residualDrawing = this.createDrawing();
+    protected initDrawings(): void {
+        this.pointsDrawing = this.createDrawing(this.size);
+        this.reconstructionRead = this.createDrawing(this.size);
+        this.reconstructionWrite = this.createDrawing(this.size);
+        this.residualDrawing = this.createDrawing(this.size);
+        this.fDrawing = this.createDrawing(this.size);
     }
 
-    private createDrawing(): Drawing {
+    protected createDrawing(size: number): Drawing {
         const textureOptions = {
-            width: this.size,
-            height: this.size,
+            width: size,
+            height: size,
             format: this.gl.RGBA,
             internalFormat: this.gl.RGBA32F,
             type: this.gl.FLOAT,
@@ -244,7 +247,7 @@ export abstract class Solver {
     }
 
     /* Render new points to points framebuffer. */
-    private renderPoints(pointsCount: number): void {
+    protected renderPoints(pointsCount: number): void {
         this.gl.bindFramebuffer(
             this.gl.FRAMEBUFFER,
             this.pointsDrawing.framebuffer
@@ -263,7 +266,6 @@ export abstract class Solver {
 
     /* Calcualte residual. */
     private calculateResidual(): void {
-        // Calculate residual
         this.gl.bindFramebuffer(
             this.gl.FRAMEBUFFER,
             this.residualDrawing.framebuffer
@@ -321,5 +323,38 @@ export abstract class Solver {
         this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
         context.drawImage(this.canvas, index * s, 0, s, s, 0, 0, s, s);
+    }
+
+    /* Calculate residual for current solution. */
+    protected residual(
+        residualDrawing: Drawing,
+        reconstructionRead: Drawing,
+        pointsDrawing: Drawing,
+        fDrawing: Drawing,
+        size: number
+    ): void {
+        this.gl.bindFramebuffer(
+            this.gl.FRAMEBUFFER,
+            residualDrawing.framebuffer
+        );
+        this.gl.viewport(0, 0, size, size);
+
+        const { program, uniforms } = this.programs.get("residual");
+        this.gl.useProgram(program);
+
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, reconstructionRead.texture);
+        this.gl.uniform1i(uniforms.get("uReconstruction"), 0);
+
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, pointsDrawing.texture);
+        this.gl.uniform1i(uniforms.get("uPoints"), 1);
+
+        this.gl.activeTexture(this.gl.TEXTURE2);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, fDrawing.texture);
+        this.gl.uniform1i(uniforms.get("uF"), 2);
+
+        this.gl.bindVertexArray(this.clipVao);
+        this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     }
 }

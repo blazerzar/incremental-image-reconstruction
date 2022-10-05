@@ -12,7 +12,7 @@ uniform float uOmega;
 
 void main() {
     vec4 points = texture(uPoints, vPosition);
-    if (points.a >= 1.0) {
+    if (points.a > 0.0) {
         oColor = points;
         return;
     }

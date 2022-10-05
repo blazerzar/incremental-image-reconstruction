@@ -10,7 +10,7 @@ export class Jacobi extends Solver {
         reconstructionCanvas: HTMLCanvasElement,
         pointsCanvas: HTMLCanvasElement,
         residualCanvas: HTMLCanvasElement,
-        weight: number
+        weight = 1.0
     ) {
         super(image, size, reconstructionCanvas, pointsCanvas, residualCanvas, [
             ["renderToCanvas.vert", "jacobi/update.frag"],

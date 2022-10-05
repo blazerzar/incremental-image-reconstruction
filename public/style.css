@@ -16,6 +16,7 @@ body {
 canvas {
     background-color: #cecece;
     margin: 10px;
+    image-rendering: pixelated;
 }
 
 #reconstruction-canvas {

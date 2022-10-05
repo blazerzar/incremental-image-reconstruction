@@ -1,10 +1,11 @@
 import { Jacobi } from "./Jacobi";
+import { SuccessiveOverRelaxation } from "./SuccessiveOverRelaxation";
 import { getImage } from "./utils";
 
 async function main() {
     // TODO: Read from website
-    const image = await getImage("images/cat.jpg");
     const size = 512;
+    const image = await getImage("images/cat.jpg", size);
     const method = "jacobi";
 
     // Get canvases that are actually shown on the web page
@@ -27,7 +28,13 @@ async function main() {
 
     let solver;
     if (method === "jacobi") {
-        solver = new Jacobi(image, size, reconstruction, points, residual, 1.0);
+        solver = new SuccessiveOverRelaxation(
+            image,
+            size,
+            reconstruction,
+            points,
+            residual
+        );
     }
 }
 
