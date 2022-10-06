@@ -7,6 +7,8 @@ export type Drawing = {
 };
 
 export abstract class Solver {
+    private running = true;
+
     // Inputs
     private image: ImageData;
     protected size: number;
@@ -18,6 +20,7 @@ export abstract class Solver {
     protected programs: Map<string, Program>;
 
     // WebGL contexts for web page canvases
+    private reconstructionCanvas: HTMLCanvasElement;
     private reconstructionContext: CanvasRenderingContext2D;
     private pointsContext: CanvasRenderingContext2D;
     private residualContext: CanvasRenderingContext2D;
@@ -73,6 +76,7 @@ export abstract class Solver {
         this.gl.getExtension("EXT_color_buffer_float");
         this.webgl = new WebGL(this.gl);
 
+        this.reconstructionCanvas = reconstructionCanvas;
         this.reconstructionContext = reconstructionCanvas.getContext("2d");
         this.pointsContext = pointsCanvas.getContext("2d");
         this.residualContext = residualCanvas.getContext("2d");
@@ -88,17 +92,17 @@ export abstract class Solver {
     }
 
     private initUserInteraction(canvas: HTMLCanvasElement): void {
-        canvas.addEventListener("mousedown", (e) => {
+        canvas.onmousedown = (e) => {
             this.mousePressed = e.button === 0;
-        });
-        window.addEventListener("mouseup", (e) => {
+        };
+        window.onmouseup = (e) => {
             this.mousePressed &&= e.button !== 0;
-        });
-        window.addEventListener("mousemove", (e) => {
+        };
+        window.onmousemove = (e) => {
             const rect = canvas.getBoundingClientRect();
             this.mouseX = (e.clientX - rect.x) / rect.width;
             this.mouseY = (e.clientY - rect.y) / rect.height;
-        });
+        };
     }
 
     private initBuffers(): void {
@@ -190,11 +194,13 @@ export abstract class Solver {
     }
 
     protected tick(): void {
-        this.addPoints();
-        this.update();
-        this.calculateResidual();
-        this.render();
-        requestAnimationFrame(this.tick.bind(this));
+        if (this.running) {
+            this.addPoints();
+            this.update();
+            this.calculateResidual();
+            this.render();
+            requestAnimationFrame(this.tick.bind(this));
+        }
     }
 
     /* Add points from the original image on user click as boundary. */
@@ -356,5 +362,33 @@ export abstract class Solver {
 
         this.gl.bindVertexArray(this.clipVao);
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
+    }
+
+    /* Clear all framebuffers, textures and programs. */
+    public free(): void {
+        this.reconstructionCanvas.onmousedown = null;
+        window.onmouseup = null;
+        window.onmousemove = null;
+
+        for (const program of this.programs) {
+            this.gl.deleteProgram(program[1].program);
+        }
+
+        for (const drawing of [
+            this.pointsDrawing,
+            this.reconstructionRead,
+            this.reconstructionWrite,
+            this.residualDrawing,
+            this.fDrawing,
+        ]) {
+            this.gl.deleteTexture(drawing.texture);
+            this.gl.deleteFramebuffer(drawing.framebuffer);
+        }
+
+        this.gl.deleteVertexArray(this.pointsVao);
+        this.gl.deleteVertexArray(this.clipVao);
+        this.gl.deleteBuffer(this.pointsBuffer);
+
+        this.running = false;
     }
 }

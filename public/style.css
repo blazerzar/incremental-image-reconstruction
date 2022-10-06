@@ -1,14 +1,58 @@
 body {
+    margin: 0;
+    background-color: darkslategray;
+}
+
+.rpgui-content h1 {
+    font-size: 1.5em;
+}
+
+.content>div {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.rpgui-content {
     display: flex;
     flex-direction: column;
     justify-content: start;
     align-items: center;
 }
 
+.parameters {
+    margin-right: 20px;
+	flex-basis: 328px;
+	flex-grow: 0;
+	flex-shrink: 0;
+}
+
+select {
+    width: 0px;
+}
+
+.rpgui-slider {
+    width: 100%;
+    display: block;
+    visibility: hidden;
+}
+
+.rpgui-button {
+    width: 100%;
+}
+
 .content {
-    padding-top: 100px;
+    padding-top: 40px;
     display: flex;
     flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    justify-content: center;
+}
+
+.content-side {
+    display: flex;
+    flex-direction: column;
     align-items: flex-start;
     align-content: flex-start;
 }
@@ -25,6 +69,23 @@ canvas {
 }
 
 #points-canvas, #residual-canvas {
-    width: 256px;
-    height: 256px;
+    width: 246px;
+    height: 246px;
+}
+
+.exclamation {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
+
+/* Remove arrows from dropdown */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
 }

@@ -218,4 +218,21 @@ export class Multigrid extends Solver {
         this.gl.bindVertexArray(this.clipVao);
         this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
     }
+
+    /* Clear framebuffers and textures used by multigrid. */
+    public free(): void {
+        super.free();
+
+        this.gl.deleteTexture(this.grids[0].temp.texture);
+        this.gl.deleteFramebuffer(this.grids[0].temp.framebuffer);
+
+        for (let i = 1; i < this.grids.length; ++i) {
+            for (const [k, v] of Object.entries(this.grids[i])) {
+                if (k !== "size" && typeof v === "object") {
+                    this.gl.deleteTexture(v.texture);
+                    this.gl.deleteFramebuffer(v.framebuffer);
+                }
+            }
+        }
+    }
 }

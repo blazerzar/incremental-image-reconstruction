@@ -2,19 +2,67 @@
 <html>
 <head>
     <title>Incremental Image Reconstruction</title>
+    <link href="rpgui/rpgui.css" rel="stylesheet" type="text/css" >
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Jacobi iteration</h1>
-    <a href="/multigrid.html">Multigrid iteration</a>
+    <div class="rpgui-content" style="overflow-y: auto">
+        <h1>Incremental Image Reconstruction</h1>
 
-    <div class="content">
-        <canvas id="reconstruction-canvas"></canvas>
-        <canvas id="points-canvas"></canvas>
-        <canvas id="residual-canvas"></canvas>
+        <div class="content">
+            <div class="rpgui-container framed-grey parameters">
+                <h2>Parameters</h2>
+
+                <label>Select solver:</label>
+                <select class="rpgui-dropdown" id="method-dropdown">
+                    <option value="jacobi">Jacobi</option>
+                    <option value="sor">SOR</option>
+                    <option value="multigrid" selected>Multigrid</option>
+                </select>
+                <hr/>
+
+                <label id="grid-size-label">Grid size: 512</label>
+                <input class="rpgui-slider" id="grid-size-slider" type="range" min="4" max="10" value="9">
+                <hr/>
+
+                <label>Weight:</label>
+                <input type="number" id="weight-field" step="0.01" value="1.0" min="0.01" max="1.0">
+                <br/><br/>
+
+                <label>Omega:</label>
+                <input type="number" id="omega-field" step="0.01" value="1.9" min="0.01" max="2.0">
+                <br/><br/>
+
+                <label>Smoothing iters:</label>
+                <input type="number" id="smoothing-iters-field" value="50" min="1" max="1000">
+                <br/><br/>
+
+                <label>Solve iters:</label>
+                <input type="number" id="solve-iters-field" value="20" min="1" max="1000">
+                <br/><br/>
+
+                <hr class="golden"/>
+                <button class="rpgui-button" id="clear-button" type="button">
+                    <p>Clear canvas</p>
+                </button>
+                <br/><br/>
+            </div>
+
+            <div class="rpgui-container framed-golden">
+                <canvas id="reconstruction-canvas"></canvas>
+            </div>
+
+            <div class="content-side rpgui-container framed-golden">
+                <canvas id="points-canvas"></canvas>
+                <canvas id="residual-canvas"></canvas>
+            </div>
+        </div>
+
+        <div class="rpgui-icon exclamation"></div>
     </div>
 
     <script src="imageReconstruction.js"></script>
+    <script src="rpgui/rpgui.js"></script>
 </body>
 </html>
 
