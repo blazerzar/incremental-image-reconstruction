@@ -22,8 +22,8 @@ export class Multigrid extends Solver {
         reconstructionCanvas: HTMLCanvasElement,
         pointsCanvas: HTMLCanvasElement,
         residualCanvas: HTMLCanvasElement,
-        nSmooth = 20,
-        nSolve = 10,
+        nSmooth = 50,
+        nSolve = 20,
         minGridSize = 2
     ) {
         super(image, size, reconstructionCanvas, pointsCanvas, residualCanvas, [
@@ -115,7 +115,8 @@ export class Multigrid extends Solver {
 
         // Post-smoothing
         for (let i = 0; i < this.nSmooth; ++i) {
-            this.smoothing(recReadFine, recWriteFine, pointsFine, fFine, sFine);
+            // Need to reverse local read and write variables
+            this.smoothing(recWriteFine, recReadFine, pointsFine, fFine, sFine);
         }
     }
 

@@ -1,4 +1,5 @@
 import { Jacobi } from "./Jacobi";
+import { Multigrid } from "./Multigrid";
 import { SuccessiveOverRelaxation } from "./SuccessiveOverRelaxation";
 import { getImage } from "./utils";
 
@@ -28,13 +29,7 @@ async function main() {
 
     let solver;
     if (method === "jacobi") {
-        solver = new SuccessiveOverRelaxation(
-            image,
-            size,
-            reconstruction,
-            points,
-            residual
-        );
+        solver = new Multigrid(image, size, reconstruction, points, residual);
     }
 }
 

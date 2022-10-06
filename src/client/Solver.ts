@@ -135,7 +135,7 @@ export abstract class Solver {
             type: this.gl.FLOAT,
             wrapS: this.gl.CLAMP_TO_EDGE,
             wrapT: this.gl.CLAMP_TO_EDGE,
-            min: this.gl.NEAREST,
+            min: this.gl.LINEAR,
             mag: this.gl.LINEAR,
         };
 
