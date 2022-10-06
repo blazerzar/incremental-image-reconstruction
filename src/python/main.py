@@ -31,7 +31,7 @@ def main():
     plt.show()
 
     # Select points for the boundary conditions
-    points_factor = 0.05
+    points_factor = 0.01
     points = np.array([[i, j] for i in range(SIZE) for j in range(SIZE)])
     points = points[
         np.random.choice(
@@ -48,10 +48,10 @@ def main():
     # solver = ConjugateGradientSolver()
     # solver = MultigridSolver()
     # solver = MultigridSolver(smoother=JacobiSolver(weight=0.67))
-    # solver = MultigridSolver(smoother=SuccessiveOverRelaxationSolver(omega=1.9))
-    solver = MultigridSolver(
-        smoother=ConjugateGradientSolver(save_state=False), min_grid_size=SIZE / 8
-    )
+    solver = MultigridSolver(smoother=SuccessiveOverRelaxationSolver(omega=1.9))
+    # solver = MultigridSolver(
+    #     smoother=ConjugateGradientSolver(save_state=False), min_grid_size=SIZE / 8
+    # )
     print('Done.')
 
     start = time()

@@ -44,7 +44,7 @@ class Solver(ABC):
             if verbose:
                 print(residual_norm)
 
-        return np.clip(x_i, 0, 1), residual, iterations
+        return x_i, residual, iterations
 
     def residual(self, x_i, f, boundary_m):
         """Compute Poisson's equation residual. Residual on boundary points
@@ -344,6 +344,7 @@ class MultigridSolver(Solver):
                 eps = self.v_cycle(eps, rhs, boundary_restricted)
 
             correction = cv2.resize(eps, (x_i.shape[1], x_i.shape[0]))
+            correction[boundary_m < 1] = 0
             x_i += correction
 
         x_i = self.smoother.iteration(x_i, f, boundary_m, self.n_smooth)
