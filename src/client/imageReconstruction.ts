@@ -12,6 +12,8 @@ let omega: number;
 let smoothingIterations: number;
 let solveIterations: number;
 
+let imageUri = "images/cat.jpg";
+
 async function main() {
     // Get canvases that are actually shown on the web page
     const reconstruction = document.getElementById(
@@ -31,7 +33,7 @@ async function main() {
             canvas.height = gridSize;
         }
 
-        const image = await getImage("images/cat.jpg", gridSize);
+        const image = await getImage(imageUri, gridSize);
 
         if (method === "jacobi") {
             solver = new Jacobi(
@@ -93,6 +95,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const solveField = document.getElementById(
         "solve-iters-field"
     ) as HTMLInputElement;
+    const imageLoad = document.getElementById("image-load") as HTMLInputElement;
 
     const setDisabled = () => {
         weightField.disabled = method !== "jacobi";
@@ -137,6 +140,32 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     solveField.onchange = () => {
         solveIterations = +solveField.value;
+    };
+
+    // Image loading
+    imageLoad.onchange = () => {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            imageUri = event.target.result as string;
+        };
+        reader.readAsDataURL(imageLoad.files[0]);
+    };
+
+    // Modal window setup
+    const modalOpen = document.getElementById("modal-open");
+    const modal = document.getElementById("modal");
+    const modalContent = document.getElementById("modal-content");
+
+    modalOpen.onclick = () => {
+        modal.style.display = "flex";
+    };
+
+    modal.onclick = () => {
+        modal.style.display = "none";
+    };
+
+    modalContent.onclick = (event) => {
+        event.stopPropagation();
     };
 
     main();

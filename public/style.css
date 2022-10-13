@@ -5,6 +5,7 @@ body {
 
 .rpgui-content h1 {
     font-size: 1.5em;
+    padding-bottom: 20px;
 }
 
 .content>div {
@@ -73,6 +74,19 @@ canvas {
     height: 246px;
 }
 
+/* Hide points and residual canvases on small screens */
+@media (orientation:portrait) {
+    .content-side {
+        display: none;
+    }
+}
+
+@media (orientation:landscape) and (max-width: 1275px) {
+    .content-side {
+        display: none;
+    }
+}
+
 .exclamation {
     position: fixed;
     bottom: 20px;
@@ -88,4 +102,42 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+}
+
+/* File selector */
+input[type=file] {
+    display: none;
+}
+
+.image-load-button {
+    cursor: url("rpgui/img/cursor/point.png") 10 0, pointer;
+}
+
+.image-load-button:hover {
+    text-decoration: underline;
+}
+
+/* Modal window */
+#modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgb(80, 80, 80);
+    background-color: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+}
+
+#modal-content {
+    width: 600px;
+    height: 250px;
+    background-color: #cecece;
+}
+
+#modal-open {
+    cursor: url("rpgui/img/cursor/point.png") 10 0, pointer;
 }

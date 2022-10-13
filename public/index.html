@@ -9,6 +9,11 @@
     <div class="rpgui-content" style="overflow-y: auto">
         <h1>Incremental Image Reconstruction</h1>
 
+        <label for="image-load" class="image-load-button">
+            Load image
+        </label>
+        <input id="image-load" type="file" accept="image/jpeg, image/png"/>
+
         <div class="content">
             <div class="rpgui-container framed-grey parameters">
                 <h2>Parameters</h2>
@@ -58,11 +63,22 @@
             </div>
         </div>
 
-        <div class="rpgui-icon exclamation"></div>
+        <div id="modal-open" class="rpgui-icon exclamation"></div>
+        <div id="modal">
+            <div id="modal-content" class="rpgui-container framed">
+                <h4>Incremental Image Reconstruction</h4>
+                <p>
+                    Author: Blaž Erzar<br/>
+                    <a target="_blank"
+                       href="https://github.com/blazerzar/incremental-image-reconstruction">
+                        GitHub repository
+                    </a>
+                </p>
+            </div>
+        </div>
     </div>
 
     <script src="imageReconstruction.js"></script>
     <script src="rpgui/rpgui.js"></script>
 </body>
 </html>
-
