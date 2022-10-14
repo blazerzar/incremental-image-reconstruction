@@ -1,7 +1,8 @@
 import { Solver } from "./Solver";
 import { Jacobi } from "./Jacobi";
-import { Multigrid } from "./Multigrid";
 import { SuccessiveOverRelaxation } from "./SuccessiveOverRelaxation";
+import { ConjugateGradient } from "./ConjugateGradient";
+import { Multigrid } from "./Multigrid";
 import { getImage } from "./utils";
 
 // Parameters
@@ -43,6 +44,14 @@ async function main() {
                 points,
                 residual,
                 weight
+            );
+        } else if (method === "cg") {
+            solver = new ConjugateGradient(
+                image,
+                gridSize,
+                reconstruction,
+                points,
+                residual
             );
         } else if (method === "sor") {
             solver = new SuccessiveOverRelaxation(

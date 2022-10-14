@@ -37,6 +37,11 @@ export abstract class Solver {
     protected residualDrawing: Drawing;
     protected fDrawing: Drawing;
 
+    // Used for dot product calculation
+    private level: number;
+    private sumFramebuffer: WebGLFramebuffer;
+    protected tempDrawing: Drawing;
+
     // Buffers
     protected pointsVao: WebGLVertexArrayObject;
     protected clipVao: WebGLVertexArrayObject;
@@ -48,6 +53,7 @@ export abstract class Solver {
         ["renderToCanvas.vert", "renderToCanvas.frag"],
         ["renderToCanvas.vert", "renderResidual.frag"],
         ["renderToCanvas.vert", "residual.frag"],
+        ["renderToCanvas.vert", "dotProduct.frag"],
     ];
 
     constructor(
@@ -89,6 +95,9 @@ export abstract class Solver {
         this.initBuffers();
         this.initDrawings();
         this.initPrograms();
+
+        this.level = Math.log2(this.size);
+        this.sumFramebuffer = this.gl.createFramebuffer();
     }
 
     private initUserInteraction(canvas: HTMLCanvasElement): void {
@@ -128,6 +137,7 @@ export abstract class Solver {
         this.reconstructionWrite = this.createDrawing(this.size);
         this.residualDrawing = this.createDrawing(this.size);
         this.fDrawing = this.createDrawing(this.size);
+        this.tempDrawing = this.createDrawing(this.size);
     }
 
     protected createDrawing(size: number): Drawing {
@@ -199,6 +209,26 @@ export abstract class Solver {
             this.update();
             this.calculateResidual();
             this.render();
+
+            // this.residual(
+            //     this.residualDrawing,
+            //     this.reconstructionRead,
+            //     this.pointsDrawing,
+            //     this.fDrawing,
+            //     this.size
+            // );
+
+            // const residualNorm = this.dotProduct(
+            //     this.residualDrawing,
+            //     this.residualDrawing
+            // );
+            // console.log(
+            //     residualNorm
+            //         .map((v) => Math.sqrt(v / (this.size * this.size)))
+            //         .slice(0, -1)
+            //         .reduce((acc, v) => acc + v, 0) / 4
+            // );
+
             requestAnimationFrame(this.tick.bind(this));
         }
     }
@@ -380,15 +410,55 @@ export abstract class Solver {
             this.reconstructionWrite,
             this.residualDrawing,
             this.fDrawing,
+            this.tempDrawing,
         ]) {
             this.gl.deleteTexture(drawing.texture);
             this.gl.deleteFramebuffer(drawing.framebuffer);
         }
+        this.gl.deleteFramebuffer(this.sumFramebuffer);
 
         this.gl.deleteVertexArray(this.pointsVao);
         this.gl.deleteVertexArray(this.clipVao);
         this.gl.deleteBuffer(this.pointsBuffer);
 
         this.running = false;
+    }
+
+    protected dotProduct(left: Drawing, right: Drawing): Float32Array {
+        // Multiply left and right hand side elementwise
+        this.gl.bindFramebuffer(
+            this.gl.FRAMEBUFFER,
+            this.tempDrawing.framebuffer
+        );
+        this.gl.viewport(0, 0, this.size, this.size);
+
+        const { program, uniforms } = this.programs.get("dotProduct");
+        this.gl.useProgram(program);
+
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, left.texture);
+        this.gl.uniform1i(uniforms.get("uLeft"), 0);
+        this.gl.activeTexture(this.gl.TEXTURE1);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, right.texture);
+        this.gl.uniform1i(uniforms.get("uRight"), 1);
+
+        this.gl.bindVertexArray(this.clipVao);
+        this.gl.drawArrays(this.gl.TRIANGLE_FAN, 0, 4);
+
+        this.gl.bindFramebuffer(this.gl.FRAMEBUFFER, this.sumFramebuffer);
+        this.gl.framebufferTexture2D(
+            this.gl.FRAMEBUFFER,
+            this.gl.COLOR_ATTACHMENT0,
+            this.gl.TEXTURE_2D,
+            this.tempDrawing.texture,
+            this.level
+        );
+        this.gl.bindTexture(this.gl.TEXTURE_2D, this.tempDrawing.texture);
+        this.gl.generateMipmap(this.gl.TEXTURE_2D);
+
+        const result = new Float32Array(4);
+        this.gl.readPixels(0, 0, 1, 1, this.gl.RGBA, this.gl.FLOAT, result);
+
+        return result.map((v) => v * this.size * this.size);
     }
 }
