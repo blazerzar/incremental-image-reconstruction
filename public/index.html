@@ -10,11 +10,20 @@
     <div class="rpgui-content" style="overflow-y: auto">
         <h1>Incremental Image Reconstruction</h1>
 
-        <label for="image-load" class="image-load-button">
-            Load image
-        </label>
-        <input id="image-load" type="file" accept="image/jpeg, image/png"/>
+        <!-- Menu bar -->
+        <div class="menu">
+            <label for="image-load" class="text-button">
+                Load image
+            </label>
+            <input id="image-load" type="file" accept="image/jpeg, image/png"/>
 
+            <label for="image-select" class="text-button">
+                Select image
+            </label>
+            <input id="image-select" type="button"/>
+        </div>
+
+        <!-- Settings and canvases -->
         <div class="content">
             <div class="rpgui-container framed-grey parameters">
                 <h2>Parameters</h2>
@@ -65,9 +74,10 @@
             </div>
         </div>
 
-        <div id="modal-open" class="rpgui-icon exclamation"></div>
-        <div id="modal">
-            <div id="modal-content" class="rpgui-container framed">
+        <!-- Information modal window -->
+        <div id="info-open" class="rpgui-icon exclamation clickable"></div>
+        <div id="info-modal" class="modal">
+            <div class="rpgui-container framed modal-content">
                 <h4>Incremental Image Reconstruction</h4>
                 <p>
                     Author: Blaž Erzar<br/>
@@ -78,6 +88,36 @@
                 </p>
             </div>
         </div>
+
+        <!-- Select image modal window -->
+        <div id="image-select-modal" class="modal">
+            <div class="rpgui-container framed modal-content">
+                <h4>Select image</h4>
+
+                <div class="images-grid">
+                    <div class="thumbnail">
+                        <img src="images/cat.jpg" alt="cat"/>
+                        <label>cat</label>
+                    </div>
+
+                    <div class="thumbnail">
+                        <img src="images/butterfly.png" alt="butterfly"/>
+                        <label>butterfly</label>
+                    </div>
+
+                    <div class="thumbnail">
+                        <img src="images/baboon.png" alt="baboon"/>
+                        <label>baboon</label>
+                    </div>
+
+                    <div class="thumbnail">
+                        <img src="images/peppers.png" alt="peppers"/>
+                        <label>peppers</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <script src="imageReconstruction.js"></script>

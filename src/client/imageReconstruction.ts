@@ -160,22 +160,44 @@ document.addEventListener("DOMContentLoaded", () => {
         reader.readAsDataURL(imageLoad.files[0]);
     };
 
-    // Modal window setup
-    const modalOpen = document.getElementById("modal-open");
-    const modal = document.getElementById("modal");
-    const modalContent = document.getElementById("modal-content");
+    // Modal windows setup
+    const infoOpen = document.getElementById("info-open");
+    const infoModal = document.getElementById("info-modal");
+    const imageSelect = document.getElementById("image-select");
+    const imageSelectModal = document.getElementById("image-select-modal");
+    const modals = document.getElementsByClassName("modal");
+    const modalContents = document.getElementsByClassName("modal-content");
 
-    modalOpen.onclick = () => {
-        modal.style.display = "flex";
+    infoOpen.onclick = () => {
+        infoModal.style.display = "flex";
+    };
+    imageSelect.onclick = () => {
+        imageSelectModal.style.display = "flex";
     };
 
-    modal.onclick = () => {
-        modal.style.display = "none";
-    };
+    // Close modal when background is clicked
+    for (const modal of modals as HTMLCollectionOf<HTMLElement>) {
+        modal.onclick = () => {
+            modal.style.display = "none";
+        };
+    }
 
-    modalContent.onclick = (event) => {
-        event.stopPropagation();
-    };
+    // Do not close when content is clicked
+    for (const modalContent of modalContents as HTMLCollectionOf<HTMLElement>) {
+        modalContent.onclick = (event) => {
+            event.stopPropagation();
+        };
+    }
+
+    const thumbnails = document.getElementsByClassName("thumbnail");
+    for (const thumbnail of thumbnails as HTMLCollectionOf<HTMLElement>) {
+        thumbnail.onclick = () => {
+            imageUri = (
+                thumbnail.firstElementChild as HTMLImageElement
+            ).getAttribute("src");
+            imageSelectModal.style.display = "none";
+        };
+    }
 
     main();
 });

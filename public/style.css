@@ -105,20 +105,22 @@ input[type=number] {
 }
 
 /* File selector */
-input[type=file] {
+label.text-button~input {
     display: none;
 }
 
-.image-load-button {
+.text-button {
+    margin-left: 30px;
+    margin-right: 30px;
     cursor: url("rpgui/img/cursor/point.png") 10 0, pointer;
 }
 
-.image-load-button:hover {
+.text-button:hover {
     text-decoration: underline;
 }
 
 /* Modal window */
-#modal {
+.modal {
     display: none;
     position: fixed;
     z-index: 1;
@@ -132,12 +134,40 @@ input[type=file] {
     justify-content: center;
 }
 
-#modal-content {
-    width: 600px;
-    height: 250px;
-    background-color: #cecece;
+.clickable {
+    cursor: url("rpgui/img/cursor/point.png") 10 0, pointer;
 }
 
-#modal-open {
+/* Menu bar */
+.menu {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+/* Select image */
+.thumbnail {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
     cursor: url("rpgui/img/cursor/point.png") 10 0, pointer;
+}
+
+.thumbnail img {
+    width: 150px;
+    height: 150px;
+}
+
+.thumbnail label {
+    margin: auto;
+    cursor: url("rpgui/img/cursor/point.png") 10 0, pointer;
+}
+
+.thumbnail:hover label {
+    text-decoration: underline;
+}
+
+.images-grid {
+    display: grid;
+    grid-template: 50% 50% / 50% 50%;
 }
