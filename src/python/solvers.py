@@ -1,3 +1,4 @@
+from time import time
 from abc import ABC, abstractmethod
 
 import numpy as np
@@ -8,7 +9,7 @@ import cv2
 class Solver(ABC):
     """Abstract class for Poisson's equation (nabla^2 phi = f) solver."""
 
-    def __init__(self, tol=1e-11):
+    def __init__(self, tol):
         """Set tolerance which is used for solver termination."""
         self.tol = tol
 
@@ -34,17 +35,21 @@ class Solver(ABC):
         )
         iterations = 0
 
+        stats = [(residual_norm, 0)]
+        start = time()
+
         while residual_norm > self.tol:
             iterations += 1
             x_i = self.iteration(x_i, f, boundary_m)
 
             residual = self.residual(x_i, f, boundary_m)
             residual_norm = self._residual_norm(residual, x_i.shape[0])
+            stats.append((residual_norm, time() - start))
 
             if verbose:
                 print(residual_norm)
 
-        return x_i, residual, iterations
+        return x_i, residual, stats
 
     def residual(self, x_i, f, boundary_m):
         """Compute Poisson's equation residual. Residual on boundary points
@@ -296,7 +301,7 @@ class MultigridSolver(Solver):
     """Poisson's equation solver implemented using multigrid iteration."""
 
     def __init__(
-        self, tol=1e-11, smoother=None, min_grid_size=2, n_smooth=50, n_solve=10
+        self, tol=1e-11, smoother=None, min_grid_size=2, n_smooth=20, n_solve=10
     ):
         """Initialize multigrid solver parameters. Smoother is the solver
         used in the pre and post smoothing steps. Multigrid is recursively
@@ -311,7 +316,7 @@ class MultigridSolver(Solver):
         """
         super().__init__(tol)
         if smoother is None:
-            smoother = JacobiSolver()
+            smoother = SuccessiveOverRelaxationSolver(omega=1.7)
 
         self.smoother = smoother
         self.min_grid_size = min_grid_size
