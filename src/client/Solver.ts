@@ -56,6 +56,11 @@ export abstract class Solver {
         ["renderToCanvas.vert", "dotProduct.frag"],
     ];
 
+    // Time measurements
+    private prevTime: number;
+    private currMean = 0;
+    private iters = 0;
+
     constructor(
         image: ImageData,
         size: number,
@@ -208,6 +213,17 @@ export abstract class Solver {
             this.addPoints();
             this.update();
             this.calculateResidual();
+
+            const currTime = Date.now();
+            if (this.prevTime !== undefined) {
+                const elapsed = currTime - this.prevTime;
+                this.currMean =
+                    (this.currMean * this.iters + elapsed) / (this.iters + 1);
+                ++this.iters;
+            }
+            this.prevTime = currTime;
+            // console.log(this.currMean);
+
             this.render();
 
             // this.residual(
