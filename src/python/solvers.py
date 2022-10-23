@@ -3,6 +3,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 from numba import njit
+from tqdm import tqdm
 import cv2
 
 
@@ -33,13 +34,14 @@ class Solver(ABC):
         residual_norm = self._residual_norm(
             self.residual(x_i, f, boundary_m), x_i.shape[0]
         )
-        iterations = 0
 
         stats = [(residual_norm, 0)]
         start = time()
 
+        if verbose:
+            pbar = tqdm()
+
         while residual_norm > self.tol:
-            iterations += 1
             x_i = self.iteration(x_i, f, boundary_m)
 
             residual = self.residual(x_i, f, boundary_m)
@@ -47,7 +49,8 @@ class Solver(ABC):
             stats.append((residual_norm, time() - start))
 
             if verbose:
-                print(residual_norm)
+                pbar.update()
+                pbar.set_description(f'{self}: {residual_norm:.3e} / {self.tol}')
 
         return x_i, residual, stats
 
@@ -114,6 +117,9 @@ class JacobiSolver(Solver):
 
         self.iteration(np.zeros((2, 2, 3)), np.zeros((2, 2, 3)), np.zeros((2, 2)))
 
+    def __repr__(self):
+        return f'JacobiSolver(weight={self.weight:.2f})'
+
     def iteration(self, x_i, f, boundary_m, iters=1):
         """Implementation of Jacobi iteration.
 
@@ -175,6 +181,9 @@ class SuccessiveOverRelaxationSolver(Solver):
         self.omega = omega
 
         self.iteration(np.zeros((2, 2, 3)), np.zeros((2, 2, 3)), np.zeros((2, 2)))
+
+    def __repr__(self):
+        return f'SuccessiveOverRelaxationSolver(omega={self.omega:.2f})'
 
     def iteration(self, x_i, f, boundary_m, iters=1):
         """Implementation of SOR iteration using red-black Gauss-Seidel.
@@ -240,6 +249,9 @@ class ConjugateGradientSolver(Solver):
         _laplacian(np.zeros((4, 4, 3)), np.zeros((2, 2)))
         self.reset_solver()
 
+    def __repr__(self):
+        return 'ConjugateGradientSolver()'
+
     def reset_solver(self):
         self.conjugate_gradient = None
         self.next_residual = None
@@ -301,7 +313,13 @@ class MultigridSolver(Solver):
     """Poisson's equation solver implemented using multigrid iteration."""
 
     def __init__(
-        self, tol=1e-11, smoother=None, min_grid_size=2, n_smooth=20, n_solve=10
+        self,
+        tol=1e-11,
+        smoother=None,
+        min_grid_size=2,
+        n_smooth=20,
+        n_solve=10,
+        eval=False,
     ):
         """Initialize multigrid solver parameters. Smoother is the solver
         used in the pre and post smoothing steps. Multigrid is recursively
@@ -313,6 +331,7 @@ class MultigridSolver(Solver):
             min_grid_size: int
             n_smooth: int ... number of smoothing iteration
             n_solve: int ... number of iteration when doing direct solve
+            eval: bool ... if set True, solver is 'compiled' before every solve
         """
         super().__init__(tol)
         if smoother is None:
@@ -322,8 +341,18 @@ class MultigridSolver(Solver):
         self.min_grid_size = min_grid_size
         self.n_smooth = n_smooth
         self.n_solve = n_solve
+        self.eval = eval
 
         _restriction(np.zeros((2, 2)))
+
+    def __repr__(self):
+        return f'MultigridSolver(n_smooth={self.n_smooth})'
+
+    def solve(self, x_i, f, points, verbose=False):
+        if self.eval:
+            boundary_m = np.ones(x_i.shape[:2])
+            self.iteration(x_i, f, boundary_m)
+        return super().solve(x_i, f, points, verbose)
 
     def iteration(self, x_i, f, boundary_m, iters=1):
         """Implementation of multigrid iteration."""

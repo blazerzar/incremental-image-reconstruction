@@ -1,7 +1,7 @@
 from time import time
 from os import path
 
-from utils import get_random_points, create_initial_image
+from utils import get_random_points, get_center_points, create_initial_image
 from solvers import (
     JacobiSolver,
     SuccessiveOverRelaxationSolver,
@@ -36,6 +36,7 @@ def main():
     # Select points for the boundary conditions
     points_factor = 0.10
     points = get_random_points(image.shape, points_factor)
+    # points = get_center_points(image.shape, image.shape[0] // 4)
     x_i = create_initial_image(image, points)
 
     print('Compiling...')

@@ -1,9 +1,13 @@
 import numpy as np
+from numba import njit
 
 
+@njit
 def get_random_points(image_shape, p):
     """Generate [p] random points from the image."""
-    h, w, *_ = image_shape
+    h = image_shape[0]
+    w = image_shape[1]
+
     points = np.array([[i, j] for i in range(h) for j in range(w)])
     points = points[
         np.random.choice(points.shape[0], int(p * h * w), replace=False),
@@ -12,9 +16,12 @@ def get_random_points(image_shape, p):
     return points
 
 
+@njit
 def get_center_points(image_shape, size):
     """Generate points that represent center square of [size]."""
-    h, w, *_ = image_shape
+    h = image_shape[0]
+    w = image_shape[1]
+
     x_0, y_0 = int((w - size) / 2), int((h - size) / 2)
     points = np.array(
         [[i, j] for i in range(y_0, y_0 + size) for j in range(x_0, x_0 + size)]
