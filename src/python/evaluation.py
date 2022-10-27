@@ -4,6 +4,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import cv2
 
+import torch
+import warnings
+from torchmetrics.functional import structural_similarity_index_measure as ssim
+from torchmetrics.image.lpip import LearnedPerceptualImagePatchSimilarity as lpips
+
 from utils import get_random_points, get_center_points, create_initial_image
 from solvers import (
     JacobiSolver,
@@ -11,6 +16,8 @@ from solvers import (
     ConjugateGradientSolver,
     MultigridSolver,
 )
+
+warnings.filterwarnings("ignore", category=UserWarning)
 
 
 def main():
@@ -66,7 +73,7 @@ def main():
 
 
 def evaluate_jacobi(images, points_random, points_center):
-    eval_params, eval_boundary, eval_size = False, False, False
+    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, True
 
     # Comparing parameters
     for w in np.linspace(0, 1, 7)[1:]:
@@ -128,9 +135,18 @@ def evaluate_jacobi(images, points_random, points_center):
                 **({} if name == '010' else {'tol': 1e-1}),
             )
 
+    if eval_sim:
+        evaluate_similarity(
+            JacobiSolver,
+            images[512],
+            points_random[512][0.1],
+            path.join('jacobi', f'similarity', f'jacobi_512_010.csv'),
+            10,
+        )
+
 
 def evaluate_sor(images, points_random, points_center):
-    eval_params, eval_boundary, eval_size = False, False, False
+    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, True
 
     # Comparing parameters
     for o in (*np.linspace(0, 1, 7)[1:], *np.linspace(1.1, 1.9, 9)):
@@ -195,9 +211,20 @@ def evaluate_sor(images, points_random, points_center):
                 omega=1.7,
             )
 
+    # Evaluate image similarity
+    if eval_sim:
+        evaluate_similarity(
+            SuccessiveOverRelaxationSolver,
+            images[512],
+            points_random[512][0.1],
+            path.join('sor', f'similarity', f'sor_512_010.csv'),
+            1,
+            omega=1.7,
+        )
+
 
 def evaluate_conjugate_gradient(images, points_random, points_center):
-    eval_boundary, eval_size = False, False
+    eval_boundary, eval_size, eval_sim = False, False, True
 
     # Comparing boundary conditions
     for p, b in points_random[256].items():
@@ -246,9 +273,21 @@ def evaluate_conjugate_gradient(images, points_random, points_center):
                 ),
             )
 
+    # Evaluate image similarity
+    if eval_sim:
+        evaluate_similarity(
+            ConjugateGradientSolver,
+            images[512],
+            points_random[512][0.1],
+            path.join(
+                'conjugate_gradient', f'similarity', f'conjugate_gradient_512_010.csv'
+            ),
+            1,
+        )
+
 
 def evaluate_multigrid(images, points_random, points_center):
-    eval_params, eval_boundary, eval_size = False, False, False
+    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, True
 
     # Comparing parameters
     for n_smooth in np.linspace(10, 50, 5):
@@ -311,6 +350,16 @@ def evaluate_multigrid(images, points_random, points_center):
                 path.join('multigrid', f'size_{name}', f'multigrid_{size}_{name}.csv'),
             )
 
+    # Evaluate image similarity
+    if eval_sim:
+        evaluate_similarity(
+            MultigridSolver,
+            images[512],
+            points_random[512][0.1],
+            path.join('multigrid', f'similarity', f'multigrid_512_010.csv'),
+            1,
+        )
+
 
 def evaluate_solver(solver_cls, image, points, filename, **kwargs):
     solver = solver_cls(**kwargs)
@@ -321,10 +370,33 @@ def evaluate_solver(solver_cls, image, points, filename, **kwargs):
     makedirs(path.dirname(file_path), exist_ok=True)
     with open(file_path, 'wt', encoding='utf-8') as f:
         f.write('iteration,residual,time\n')
-        for i, (residual, time) in enumerate(stats):
+        for i, (residual, time, _) in enumerate(stats):
             f.write(f'{i},{residual},{time}\n')
 
     print(f'Saved {filename}')
+
+
+def evaluate_similarity(solver_cls, image, points, filename, save_iters, **kwargs):
+    solver = solver_cls(**kwargs)
+    x_i = create_initial_image(image, points)
+    _, _, stats = solver.solve(x_i, np.zeros_like(x_i), points, True, save_iters)
+
+    device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    file_path = path.join(path.dirname(__file__), '..', '..', 'results', filename)
+    makedirs(path.dirname(file_path), exist_ok=True)
+    with open(file_path, 'wt', encoding='utf-8') as f:
+        f.write('iteration,residual,time,ssim,lpips\n')
+
+        target = torch.from_numpy(np.expand_dims(image, -1).T).float().to(device)
+        for i, (residual, time, im) in enumerate(stats):
+            if im is None:
+                continue
+
+            pred = torch.from_numpy(np.expand_dims(im, -1).T).float().to(device)
+            ssim_measure = ssim(pred, target, data_range=1.0)
+            lpips_measure = lpips().to(device)(pred, target)
+
+            f.write(f'{i},{residual},{time},{ssim_measure},{lpips_measure}\n')
 
 
 if __name__ == '__main__':

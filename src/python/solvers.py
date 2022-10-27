@@ -16,7 +16,7 @@ class Solver(ABC):
 
         self.residual(np.zeros((2, 2, 3)), np.zeros((2, 2, 3)), np.zeros((2, 2)))
 
-    def solve(self, x_i, f, points, verbose=False):
+    def solve(self, x_i, f, points, verbose=False, save=None):
         """Solve Poisson'n equation nabla^2 phi = f using boundary conditions
            in points.
 
@@ -24,6 +24,8 @@ class Solver(ABC):
             x_i: np.ndarray (n, n) ... starting approximation
             f: np.ndarray (n, n)
             points: np.ndarray (m, 2)
+            verbose: bool ... show progress in the terminal
+            save: int ... save intermediate x_i every [save] iterations
 
         n ... matrix size
         m ... number of boundary conditions
@@ -35,18 +37,27 @@ class Solver(ABC):
             self.residual(x_i, f, boundary_m), x_i.shape[0]
         )
 
-        stats = [(residual_norm, 0)]
+        iteration = 0
+
+        stats = [(residual_norm, 0, x_i if save is not None else None)]
         start = time()
 
         if verbose:
             pbar = tqdm()
 
         while residual_norm > self.tol:
+            iteration += 1
             x_i = self.iteration(x_i, f, boundary_m)
 
             residual = self.residual(x_i, f, boundary_m)
             residual_norm = self._residual_norm(residual, x_i.shape[0])
-            stats.append((residual_norm, time() - start))
+            x_i_save = (
+                x_i
+                if save is not None
+                and (iteration % save == 0 or residual_norm <= self.tol)
+                else None
+            )
+            stats.append((residual_norm, time() - start, x_i_save))
 
             if verbose:
                 pbar.update()
@@ -348,11 +359,11 @@ class MultigridSolver(Solver):
     def __repr__(self):
         return f'MultigridSolver(n_smooth={self.n_smooth})'
 
-    def solve(self, x_i, f, points, verbose=False):
+    def solve(self, x_i, f, points, verbose=False, save=None):
         if self.eval:
             boundary_m = np.ones(x_i.shape[:2])
             self.iteration(x_i, f, boundary_m)
-        return super().solve(x_i, f, points, verbose)
+        return super().solve(x_i, f, points, verbose, save)
 
     def iteration(self, x_i, f, boundary_m, iters=1):
         """Implementation of multigrid iteration."""
