@@ -16,7 +16,8 @@ def main():
 
     plot_512_010()
     plot_512_center()
-    plot_similarity()
+    plot_similarity_010()
+    plot_similarity_center()
 
 
 def plot_512_010():
@@ -213,7 +214,7 @@ def plot_512_center_time(results, labels):
     # plt.show()
 
 
-def plot_similarity():
+def plot_similarity_010():
     results = []
     labels = ['Jacobi', 'SOR', 'CG', 'MG']
 
@@ -226,24 +227,27 @@ def plot_similarity():
         data['residual'] /= data['residual'][0]
         results.append(data)
 
-    plot_ssim(results, labels)
-    plot_lpips(results, labels)
+    plot_ssim_010(results, labels)
+    plot_lpips_010(results, labels)
 
 
-def plot_ssim(results, labels):
+def plot_ssim_010(results, labels):
     # Remove rows after SSIM convergence
     for data in results:
         converged = np.abs(data['ssim'] - data['ssim'].iloc[-1]) < 1e-3
         data.drop(index=data[converged].index[1:], inplace=True)
 
-    plot_ssim_iters(results, labels)
-    plot_ssim_time(results, labels)
+    plot_ssim_iters_010(results, labels)
+    plot_ssim_time_010(results, labels)
 
 
-def plot_ssim_iters(results, labels):
+def plot_ssim_iters_010(results, labels):
     # Create figure
     plt.clf()
-    plt.title('Konvergenca glede na metriko SSIM')
+    plt.title(
+        'Konvergenca s sliko velikosti 512 in\n'
+        '$10\, \%$ naključnih točk glede na metriko SSIM'
+    )
     plt.grid(axis='y', dashes=(10, 10))
 
     steps = {
@@ -279,10 +283,13 @@ def plot_ssim_iters(results, labels):
     # plt.show()
 
 
-def plot_ssim_time(results, labels):
+def plot_ssim_time_010(results, labels):
     # Create figure
     plt.clf()
-    plt.title('Čas izvajanja glede na metriko SSIM')
+    plt.title(
+        'Čas izvajanja s sliko velikosti 512 in\n'
+        '$10\, \%$ naključnih točk glede na metriko SSIM'
+    )
     plt.grid(axis='y', dashes=(10, 10))
 
     steps = {
@@ -318,20 +325,23 @@ def plot_ssim_time(results, labels):
     # plt.show()
 
 
-def plot_lpips(results, labels):
+def plot_lpips_010(results, labels):
     # Remove rows after LPIPS convergence
     for data in results:
         converged = np.abs(data['lpips'] - data['lpips'].iloc[-1]) < 1e-3
         data.drop(index=data[converged].index[1:], inplace=True)
 
-    plot_lpips_iters(results, labels)
-    plot_lpips_time(results, labels)
+    plot_lpips_iters_010(results, labels)
+    plot_lpips_time_010(results, labels)
 
 
-def plot_lpips_iters(results, labels):
+def plot_lpips_iters_010(results, labels):
     # Create figure
     plt.clf()
-    plt.title('Konvergenca glede na metriko LPIPS')
+    plt.title(
+        'Konvergenca s sliko velikosti 512 in\n'
+        '$10\, \%$ naključnih točk glede na metriko LPIPS'
+    )
     plt.grid(axis='y', dashes=(10, 10))
 
     steps = {
@@ -367,10 +377,13 @@ def plot_lpips_iters(results, labels):
     # plt.show()
 
 
-def plot_lpips_time(results, labels):
+def plot_lpips_time_010(results, labels):
     # Create figure
     plt.clf()
-    plt.title('Čas izvajanja glede na metriko LPIPS')
+    plt.title(
+        'Čas izvajanja s sliko velikosti 512 in\n'
+        '$10\, \%$ naključnih točk glede na metriko LPIPS'
+    )
     plt.grid(axis='y', dashes=(10, 10))
 
     steps = {
@@ -403,6 +416,207 @@ def plot_lpips_time(results, labels):
     plt.xlim(0, 10)
 
     plt.savefig(path.join(RESULTS_DIR, 'methods', 'plot_methods_lpips_time.pdf'))
+    # plt.show()
+
+
+def plot_similarity_center():
+    results = []
+    labels = ['Jacobi', 'SOR', 'CG', 'MG']
+
+    for method in ('jacobi', 'sor', 'conjugate_gradient', 'multigrid'):
+        filename = f'{method}_512_center.csv'
+        data = pd.read_csv(
+            path.join(RESULTS_DIR, method, 'similarity', filename),
+            index_col='iteration',
+        )
+        data['residual'] /= data['residual'][0]
+        results.append(data)
+
+    plot_ssim_center(results, labels)
+    plot_lpips_center(results, labels)
+
+
+def plot_ssim_center(results, labels):
+    # Remove rows after SSIM convergence
+    for data in results:
+        converged = np.abs(data['ssim'] - data['ssim'].iloc[-1]) < 1e-3
+        data.drop(index=data[converged].index[1:], inplace=True)
+
+    plot_ssim_iters_center(results, labels)
+    plot_ssim_time_center(results, labels)
+
+
+def plot_ssim_iters_center(results, labels):
+    # Create figure
+    plt.clf()
+    plt.title(
+        'Konvergenca s sliko velikosti 512 in\n'
+        'sredinskimi točkami glede na metriko SSIM'
+    )
+    plt.grid(axis='y', dashes=(10, 10))
+
+    steps = {
+        'Jacobi': 5,
+        'SOR': 5,
+        'CG': 50,
+        'MG': 1,
+    }
+
+    # Plot
+    for r, l in zip(results, labels):
+        plt.plot(
+            'iteration',
+            'ssim',
+            data=pd.concat([r[:: steps[l]], r.iloc[-1:, :]]).reset_index(level=0),
+            label=l,
+            markevery=(1, 1),
+        )
+    plt.legend(title='metoda', handlelength=3, loc='lower right')
+
+    # Y axis
+    plt.ylabel('SSIM')
+    plt.ylim(bottom=0)
+
+    # X axis
+    plt.xlabel('Iteracije')
+    plt.gca().xaxis.set_minor_locator(MultipleLocator(25))
+    plt.xlim(0, 400)
+
+    plt.savefig(path.join(RESULTS_DIR, 'methods', 'plot_methods_ssim_iters_center.pdf'))
+    # plt.show()
+
+
+def plot_ssim_time_center(results, labels):
+    # Create figure
+    plt.clf()
+    plt.title(
+        'Čas izvajanja s sliko velikosti 512 in\n'
+        'sredinskimi točkami glede na metriko SSIM'
+    )
+    plt.grid(axis='y', dashes=(10, 10))
+
+    steps = {
+        'Jacobi': 5,
+        'SOR': 5,
+        'CG': 50,
+        'MG': 1,
+    }
+
+    # Plot
+    for r, l in zip(results, labels):
+        plt.plot(
+            'time',
+            'ssim',
+            data=pd.concat([r[:: steps[l]], r.iloc[-1:, :]]),
+            label=l,
+            markevery=(1, 1),
+        )
+    plt.legend(title='metoda', handlelength=3, loc='lower right')
+
+    # Y axis
+    plt.ylabel('SSIM')
+    plt.ylim(bottom=0)
+    plt.yticks(np.linspace(0, 0.25, 6))
+
+    # X axis
+    plt.xlabel(r'Čas [$s$]')
+    plt.gca().xaxis.set_minor_locator(MultipleLocator(5))
+    plt.xlim(0, 60)
+
+    plt.savefig(path.join(RESULTS_DIR, 'methods', 'plot_methods_ssim_time_center.pdf'))
+    # plt.show()
+
+
+def plot_lpips_center(results, labels):
+    # Remove rows after LPIPS convergence
+    for data in results:
+        converged = np.abs(data['lpips'] - data['lpips'].iloc[-1]) < 1e-3
+        data.drop(index=data[converged].index[1:], inplace=True)
+
+    plot_lpips_iters_center(results, labels)
+    plot_lpips_time_center(results, labels)
+
+
+def plot_lpips_iters_center(results, labels):
+    # Create figure
+    plt.clf()
+    plt.title(
+        'Konvergenca s sliko velikosti 512 in\n'
+        'sredinskimi točkami glede na metriko LPIPS'
+    )
+    plt.grid(axis='y', dashes=(10, 10))
+
+    steps = {
+        'Jacobi': 5,
+        'SOR': 5,
+        'CG': 50,
+        'MG': 1,
+    }
+
+    # Plot
+    for r, l in zip(results, labels):
+        plt.plot(
+            'iteration',
+            'lpips',
+            data=pd.concat([r[:: steps[l]], r.iloc[-1:, :]]).reset_index(level=0),
+            label=l,
+            markevery=(1, 1),
+        )
+    plt.legend(title='metoda', handlelength=3, loc='lower right')
+
+    # Y axis
+    plt.ylabel('LPIPS')
+    plt.ylim(0.6, 0.9)
+
+    # X axis
+    plt.xlabel('Iteracije')
+    plt.gca().xaxis.set_minor_locator(MultipleLocator(50))
+    plt.xlim(0, 600)
+
+    plt.savefig(
+        path.join(RESULTS_DIR, 'methods', 'plot_methods_lpips_iters_center.pdf')
+    )
+    # plt.show()
+
+
+def plot_lpips_time_center(results, labels):
+    # Create figure
+    plt.clf()
+    plt.title(
+        'Čas izvajanja s sliko velikosti 512 in\n'
+        'sredinskimi točkami glede na metriko LPIPS'
+    )
+    plt.grid(axis='y', dashes=(10, 10))
+
+    steps = {
+        'Jacobi': 5,
+        'SOR': 5,
+        'CG': 50,
+        'MG': 1,
+    }
+
+    # Plot
+    for r, l in zip(results, labels):
+        plt.plot(
+            'time',
+            'lpips',
+            data=pd.concat([r[:: steps[l]], r.iloc[-1:, :]]),
+            label=l,
+            markevery=(1, 1),
+        )
+    plt.legend(title='metoda', handlelength=3, loc='lower right')
+
+    # Y axis
+    plt.ylabel('LPIPS')
+    plt.ylim(0.6, 0.9)
+
+    # X axis
+    plt.xlabel(r'Čas [$s$]')
+    plt.xlim(0, 70)
+    plt.gca().xaxis.set_minor_locator(MultipleLocator(5))
+    # plt.xlim(0, 10)
+
+    plt.savefig(path.join(RESULTS_DIR, 'methods', 'plot_methods_lpips_time_center.pdf'))
     # plt.show()
 
 

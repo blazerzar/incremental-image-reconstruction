@@ -73,7 +73,7 @@ def main():
 
 
 def evaluate_jacobi(images, points_random, points_center):
-    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, True
+    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, False
 
     # Comparing parameters
     for w in np.linspace(0, 1, 7)[1:]:
@@ -143,10 +143,18 @@ def evaluate_jacobi(images, points_random, points_center):
             path.join('jacobi', f'similarity', f'jacobi_512_010.csv'),
             10,
         )
+        evaluate_similarity(
+            JacobiSolver,
+            images[512],
+            points_center[512],
+            path.join('jacobi', f'similarity', f'jacobi_512_center.csv'),
+            10,
+            tol=1e-1,
+        )
 
 
 def evaluate_sor(images, points_random, points_center):
-    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, True
+    eval_params, eval_boundary, eval_size, eval_sim = False, False, False, False
 
     # Comparing parameters
     for o in (*np.linspace(0, 1, 7)[1:], *np.linspace(1.1, 1.9, 9)):
@@ -221,6 +229,15 @@ def evaluate_sor(images, points_random, points_center):
             1,
             omega=1.7,
         )
+        evaluate_similarity(
+            SuccessiveOverRelaxationSolver,
+            images[512],
+            points_center[512],
+            path.join('sor', f'similarity', f'sor_512_center.csv'),
+            10,
+            omega=1.7,
+            tol=1e-1,
+        )
 
 
 def evaluate_conjugate_gradient(images, points_random, points_center):
@@ -281,6 +298,17 @@ def evaluate_conjugate_gradient(images, points_random, points_center):
             points_random[512][0.1],
             path.join(
                 'conjugate_gradient', f'similarity', f'conjugate_gradient_512_010.csv'
+            ),
+            1,
+        )
+        evaluate_similarity(
+            ConjugateGradientSolver,
+            images[512],
+            points_center[512],
+            path.join(
+                'conjugate_gradient',
+                f'similarity',
+                f'conjugate_gradient_512_center.csv',
             ),
             1,
         )
@@ -359,6 +387,13 @@ def evaluate_multigrid(images, points_random, points_center):
             path.join('multigrid', f'similarity', f'multigrid_512_010.csv'),
             1,
         )
+        evaluate_similarity(
+            MultigridSolver,
+            images[512],
+            points_center[512],
+            path.join('multigrid', f'similarity', f'multigrid_512_center.csv'),
+            1,
+        )
 
 
 def evaluate_solver(solver_cls, image, points, filename, **kwargs):
@@ -382,6 +417,7 @@ def evaluate_similarity(solver_cls, image, points, filename, save_iters, **kwarg
     _, _, stats = solver.solve(x_i, np.zeros_like(x_i), points, True, save_iters)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
+    lpips_loss = lpips().to(device)
     file_path = path.join(path.dirname(__file__), '..', '..', 'results', filename)
     makedirs(path.dirname(file_path), exist_ok=True)
     with open(file_path, 'wt', encoding='utf-8') as f:
@@ -394,9 +430,12 @@ def evaluate_similarity(solver_cls, image, points, filename, save_iters, **kwarg
 
             pred = torch.from_numpy(np.expand_dims(im, -1).T).float().to(device)
             ssim_measure = ssim(pred, target, data_range=1.0)
-            lpips_measure = lpips().to(device)(pred, target)
+            lpips_measure = lpips_loss(pred, target)
 
             f.write(f'{i},{residual},{time},{ssim_measure},{lpips_measure}\n')
+
+    if device == 'cuda':
+        torch.cuda.empty_cache()
 
 
 if __name__ == '__main__':
