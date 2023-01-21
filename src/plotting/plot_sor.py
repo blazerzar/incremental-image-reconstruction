@@ -35,16 +35,28 @@ def plot_params():
         results.append(data / data[0])
         labels.append(f'{omega / 100:.2f}')
 
+    order = [i for (i, _) in sorted(enumerate(labels), key=lambda x: float(x[1]))]
+
     # Create figure
     plt.clf()
-    plt.title('Konvergenca zaporedne prekomerne sprostitve')
+    plt.title(
+        'Konvergenca zaporedne prekomerne sprostitve\n'
+        'pri različnih vrednostih $\\omega$'
+    )
     plt.grid(axis='y', dashes=(10, 10))
 
     # Plot
     for r, l in zip(results, labels):
         # Plot every 50th iterations and the last one
         plt.plot(pd.concat((r[::50], r.iloc[-1:])), label=l, markevery=(1, 1))
-    plt.legend(title=r'$\omega$', handlelength=3)
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(
+        [handles[i] for i in order],
+        [labels[i] for i in order],
+        title=r'$\omega$',
+        handlelength=3,
+    )
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -84,10 +96,13 @@ def plot_boundary():
         results.append(data / data[0])
         labels.append(p)
 
+    order = [i for (i, _) in sorted(enumerate(labels), key=lambda x: x[1])]
+    labels = [f'{100 * float(p):.0f} \\%' if p[0] == '0' else 'središ.' for p in labels]
+
     # Create figure
     plt.clf()
     plt.title(
-        'Konvergenca prekomerne zaporedne sprostitve\npri različnih robnih pogojih'
+        'Konvergenca zaporedne prekomerne sprostitve\npri različnih robnih pogojih'
     )
     plt.grid(axis='y', dashes=(10, 10))
 
@@ -95,7 +110,15 @@ def plot_boundary():
     for r, l in zip(results, labels):
         # Plot every 100th iterations and the last one
         plt.plot(pd.concat((r[::100], r.iloc[-1:])), label=l, markevery=(1, 1))
-    plt.legend(title='robni pogoji', handlelength=3, loc='upper right')
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(
+        [handles[i] for i in order],
+        [labels[i] for i in order],
+        title='robni pogoji',
+        handlelength=3,
+        loc='upper right',
+    )
 
     # Y axis
     plt.ylabel('Relativni ostanek')

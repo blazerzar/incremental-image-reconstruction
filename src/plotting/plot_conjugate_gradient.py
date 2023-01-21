@@ -40,6 +40,9 @@ def plot_boundary():
         results.append(data / data[0])
         labels.append(p)
 
+    order = [i for (i, _) in sorted(enumerate(labels), key=lambda x: x[1])]
+    labels = [f'{100 * float(p):.0f} \\%' if p[0] == '0' else 'središ.' for p in labels]
+
     # Create figure
     plt.clf()
     plt.title(
@@ -51,7 +54,15 @@ def plot_boundary():
     for r, l in zip(results, labels):
         # Plot every 50th iterations and the last one
         plt.plot(pd.concat((r[::50], r.iloc[-1:])), label=l, markevery=(1, 1))
-    plt.legend(title='robni pogoji', handlelength=3, loc='upper right')
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(
+        [handles[i] for i in order],
+        [labels[i] for i in order],
+        title='robni pogoji',
+        handlelength=3,
+        loc='upper right',
+    )
 
     # Y axis
     plt.ylabel('Relativni ostanek')

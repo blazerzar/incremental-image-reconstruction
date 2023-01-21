@@ -33,16 +33,25 @@ def plot_params():
         results.append(data / data[0])
         labels.append(f'{w / 100:.2f}')
 
+    order = [i for (i, _) in sorted(enumerate(labels), key=lambda x: float(x[1]))]
+
     # Create figure
     plt.clf()
-    plt.title('Konvergenca Jacobijeve iteracije')
+    plt.title('Konvergenca Jacobijeve metode\npri različnih vrednostih $w$')
     plt.grid(axis='y', dashes=(10, 10))
 
     # Plot
     for r, l in zip(results, labels):
         # Plot every 1000th iterations and the last one
         plt.plot(pd.concat((r[::1000], r.iloc[-1:])), label=l, markevery=(1, 1))
-    plt.legend(title=r'$w$', handlelength=3)
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(
+        [handles[i] for i in order],
+        [labels[i] for i in order],
+        title=r'$w$',
+        handlelength=3,
+    )
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -82,16 +91,27 @@ def plot_boundary():
         results.append(data / data[0])
         labels.append(p)
 
+    order = [i for (i, _) in sorted(enumerate(labels), key=lambda x: x[1])]
+    labels = [f'{100 * float(p):.0f} \\%' if p[0] == '0' else 'središ.' for p in labels]
+
     # Create figure
     plt.clf()
-    plt.title('Konvergenca Jacobijeve iteracije\npri različnih robnih pogojih')
+    plt.title('Konvergenca Jacobijeve metode\npri različnih robnih pogojih')
     plt.grid(axis='y', dashes=(10, 10))
 
     # Plot
     for r, l in zip(results, labels):
         # Plot every 250th iterations and the last one
         plt.plot(pd.concat((r[::250], r.iloc[-1:])), label=l, markevery=(1, 1))
-    plt.legend(title='robni pogoji', handlelength=3, loc='upper right')
+
+    handles, labels = plt.gca().get_legend_handles_labels()
+    plt.legend(
+        [handles[i] for i in order],
+        [labels[i] for i in order],
+        title='robni pogoji',
+        handlelength=3,
+        loc='upper right',
+    )
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -131,7 +151,7 @@ def plot_size_time():
 
     # Create figure
     plt.clf()
-    plt.title('Čas izvajanja Jacobijeve iteracije\npri različnih velikostih')
+    plt.title('Čas izvajanja Jacobijeve metode\npri različnih velikostih')
     plt.grid(axis='y', dashes=(10, 10))
 
     # Plot
@@ -176,7 +196,7 @@ def plot_size_iters():
 
     # Create figure
     plt.clf()
-    plt.title('Konvergenca Jacobijeve iteracije\npri različnih velikostih')
+    plt.title('Konvergenca Jacobijeve metode\npri različnih velikostih')
     plt.grid(axis='y', dashes=(10, 10))
 
     # Plot
