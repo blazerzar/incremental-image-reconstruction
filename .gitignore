@@ -5,3 +5,6 @@ dist
 __pycache__
 
 dataset
+
+env
+.python-version
