@@ -71,7 +71,7 @@ def plot_params_iters(results, labels):
     plt.ylim(1e-16, 1)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
 
     plt.savefig(path.join(RESULTS_DIR, 'multigrid', 'plot_multigrid_params_iters.pdf'))
     # plt.show()
@@ -147,7 +147,7 @@ def plot_boundary():
     plt.legend(
         [handles[i] for i in order],
         [labels[i] for i in order],
-        title='robni pogoji',
+        title='Robni pogoji',
         handlelength=3,
         loc='upper right',
     )
@@ -159,7 +159,7 @@ def plot_boundary():
     plt.ylim(1e-16, 1)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.xticks(np.arange(0, 21, 2))
     plt.gca().minorticks_on()
     plt.gca().xaxis.set_minor_locator(MultipleLocator(1))
@@ -202,7 +202,7 @@ def plot_size_time():
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='velikost', handlelength=3, loc='upper right')
+    plt.legend(title='Velikost', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -240,7 +240,7 @@ def plot_size_iters():
     # Plot
     for r, l in sorted(zip(results, labels), key=lambda x: x[1]):
         plt.plot(r, label=l, markevery=(1, 1))
-    plt.legend(title='velikost', handlelength=3, loc='upper right')
+    plt.legend(title='Velikost', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -250,7 +250,7 @@ def plot_size_iters():
 
     # X axis
     plt.xticks(np.arange(0, 22, 2))
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().minorticks_off()
     plt.gca().minorticks_on()
     plt.gca().xaxis.set_minor_locator(MultipleLocator(250))

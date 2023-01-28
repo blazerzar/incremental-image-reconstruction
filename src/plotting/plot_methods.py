@@ -60,7 +60,7 @@ def plot_512_010_iters(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='upper right')
+    plt.legend(title='Metoda', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -69,7 +69,7 @@ def plot_512_010_iters(results, labels):
     plt.ylim(1e-16, 1)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().minorticks_on()
     plt.gca().xaxis.set_minor_locator(MultipleLocator(100))
 
@@ -99,7 +99,7 @@ def plot_512_010_time(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='upper right')
+    plt.legend(title='Metoda', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -156,7 +156,7 @@ def plot_512_center_iters(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='upper right')
+    plt.legend(title='Metoda', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -166,7 +166,7 @@ def plot_512_center_iters(results, labels):
     plt.ylim(1e-14, 1)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().minorticks_on()
     plt.gca().xaxis.set_minor_locator(MultipleLocator(250))
 
@@ -196,7 +196,7 @@ def plot_512_center_time(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='upper right')
+    plt.legend(title='Metoda', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -266,7 +266,7 @@ def plot_ssim_iters_010(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='lower right')
+    plt.legend(title='Metoda', handlelength=3, loc='lower right')
 
     # Y axis
     plt.ylabel('SSIM')
@@ -274,7 +274,7 @@ def plot_ssim_iters_010(results, labels):
     plt.gca().yaxis.set_minor_locator(MultipleLocator(0.05))
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.xticks(np.arange(0, 121, 20))
     plt.gca().xaxis.set_minor_locator(MultipleLocator(10))
     plt.xlim(0, 120)
@@ -308,7 +308,7 @@ def plot_ssim_time_010(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='lower right')
+    plt.legend(title='Metoda', handlelength=3, loc='lower right')
 
     # Y axis
     plt.ylabel('SSIM')
@@ -360,7 +360,7 @@ def plot_lpips_iters_010(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='upper right')
+    plt.legend(title='Metoda', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('LPIPS')
@@ -368,7 +368,7 @@ def plot_lpips_iters_010(results, labels):
     plt.gca().yaxis.set_minor_locator(MultipleLocator(0.05))
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.xticks(np.arange(0, 101, 20))
     plt.gca().xaxis.set_minor_locator(MultipleLocator(10))
     plt.xlim(0, 100)
@@ -402,7 +402,7 @@ def plot_lpips_time_010(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='upper right')
+    plt.legend(title='Metoda', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('LPIPS')
@@ -471,14 +471,14 @@ def plot_ssim_iters_center(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='lower right')
+    plt.legend(title='Metoda', handlelength=3, loc='lower right')
 
     # Y axis
     plt.ylabel('SSIM')
     plt.ylim(bottom=0)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().xaxis.set_minor_locator(MultipleLocator(25))
     plt.xlim(0, 400)
 
@@ -511,7 +511,7 @@ def plot_ssim_time_center(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='lower right')
+    plt.legend(title='Metoda', handlelength=3, loc='lower right')
 
     # Y axis
     plt.ylabel('SSIM')
@@ -562,14 +562,14 @@ def plot_lpips_iters_center(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='lower right')
+    plt.legend(title='Metoda', handlelength=3, loc='lower right')
 
     # Y axis
     plt.ylabel('LPIPS')
     plt.ylim(0.6, 0.9)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().xaxis.set_minor_locator(MultipleLocator(50))
     plt.xlim(0, 600)
 
@@ -604,7 +604,7 @@ def plot_lpips_time_center(results, labels):
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='metoda', handlelength=3, loc='lower right')
+    plt.legend(title='Metoda', handlelength=3, loc='lower right')
 
     # Y axis
     plt.ylabel('LPIPS')

@@ -67,7 +67,7 @@ def plot_params():
 
     # X axis
     plt.xticks(np.arange(0, 750, 100))
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().minorticks_on()
     plt.gca().xaxis.set_minor_locator(MultipleLocator(50))
 
@@ -115,7 +115,7 @@ def plot_boundary():
     plt.legend(
         [handles[i] for i in order],
         [labels[i] for i in order],
-        title='robni pogoji',
+        title='Robni pogoji',
         handlelength=3,
         loc='upper right',
     )
@@ -128,7 +128,7 @@ def plot_boundary():
     plt.ylim(1e-14, 1)
 
     # X axis
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
     plt.gca().minorticks_on()
     plt.gca().xaxis.set_minor_locator(MultipleLocator(100))
     plt.xlim(0, 1000)
@@ -170,7 +170,7 @@ def plot_size_time():
             label=l,
             markevery=(1, 1),
         )
-    plt.legend(title='velikost', handlelength=3, loc='upper right')
+    plt.legend(title='Velikost', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Relativni ostanek')
@@ -208,7 +208,7 @@ def plot_size_iters():
     # Plot
     for r, l in sorted(zip(results, labels), key=lambda x: x[1]):
         plt.plot(pd.concat((r[::250], r.iloc[-1:])), label=l, markevery=(1, 1))
-    plt.legend(title='velikost', handlelength=3, loc='upper right')
+    plt.legend(title='Velikost', handlelength=3, loc='upper right')
 
     # Y axis
     plt.ylabel('Ostanek')
@@ -217,7 +217,7 @@ def plot_size_iters():
 
     # X axis
     plt.xticks(np.arange(0, 2050, 200))
-    plt.xlabel('Iteracije')
+    plt.xlabel('Iteracija')
 
     plt.savefig(path.join(RESULTS_DIR, 'sor', 'plot_sor_size_iters.pdf'))
     # plt.show()
